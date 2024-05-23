@@ -1,0 +1,53 @@
+# test values for local minikube testing.
+
+namespace: prices-svc
+replicaCount: 1
+
+# minikube start
+# eval $(minikube docker-env)
+# docker build -t price-svc .
+
+image:
+  repository: docker.io/library/price-svc
+  tag: latest
+  pullPolicy: Never
+
+service:
+  type: ClusterIP  
+  port: 8000
+
+ingress:
+  enabled: false 
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: []
+
+env:
+  DB_DIR: "/var/lib/sqlite"
+  DB_NAME: "btc_prices.db" 
+  RETENTION_DAYS: "365" 
+  TICKER: "BTC-USD" 
+  CURRENCIES: "EUR CZK" 
+  CLEAN_UP_INTERVAL_MINS: "5" 
+  FETCH_INTERVAL_MINS: "1"
+  DEBUG: "false" 
+  HOST: "0.0.0.0" 
+  PORT: "8000" 
+
+secret:
+  apiKey: "test"
+
+persistence:
+  enabled: false
+  accessMode: ReadWriteOnce 
+  size: 1Gi 
+
+customConfigMap: "" 
+customSecret: "" 

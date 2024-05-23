@@ -1,0 +1,61 @@
+# Namespace where the resources will be deployed
+namespace: my-namespace
+
+# Number of replicas for the deployment
+replicaCount: 1
+
+# Docker image configuration
+image:
+  repository: your_dockerhub_username/your_image_name # Docker repository and image name
+  tag: latest # Docker image tag
+  pullPolicy: IfNotPresent # Image pull policy
+
+# Service configuration
+service:
+  type: ClusterIP # Type of service (ClusterIP, NodePort, LoadBalancer)
+  port: 80 # Service port
+
+# Ingress configuration
+ingress:
+  enabled: false # Enable or disable ingress
+  annotations: {} # Annotations for the ingress resource
+  hosts: # List of hosts for the ingress
+    - host: chart-example.local
+      paths: [] # Paths for the ingress
+  tls: [] # TLS configuration for the ingress
+
+# Resource requests and limits for the deployment
+resources: {}
+# Node selector for scheduling the pods
+nodeSelector: {}
+# Tolerations for scheduling the pods
+tolerations: []
+# Affinity rules for scheduling the pods
+affinity: []
+
+# Environment variables for the application
+env:
+  DB_DIR: "/var/lib/sqlite" # Directory for SQLite database
+  DB_NAME: "btc_prices.db" # Name of the SQLite database file
+  RETENTION_DAYS: "365" # Number of days to retain the data
+  TICKER: "BTC-USD" # Ticker symbol for the cryptocurrency
+  CURRENCIES: "EUR CZK" # List of currencies to store prices for
+  CLEAN_UP_INTERVAL_MINS: "5" # Interval (in minutes) to run DB clean up
+  FETCH_INTERVAL_MINS: "1" # Interval (in minutes) to retrieve prices
+  DEBUG: "false" # Debug mode (true/false)
+  HOST: "0.0.0.0" # Host to bind the application
+  PORT: "8000" # Port to bind the application
+
+# Secret configuration for sensitive data
+secret:
+  apiKey: "your_api_key" # API key for accessing the service
+
+# Persistent Volume Claim configuration for SQLite storage
+persistence:
+  enabled: true # Enable or disable persistence
+  accessMode: ReadWriteOnce # Access mode for the PVC
+  size: 1Gi # Size of the PVC
+
+# Custom ConfigMap and Secret names
+customConfigMap: "" # Name of the custom ConfigMap (if any)
+customSecret: "" # Name of the custom Secret (if any)

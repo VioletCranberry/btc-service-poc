@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "app-chart.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "app-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "app-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "app-chart.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ if .Values.customConfigMap }}{{ .Values.customConfigMap }}{{ else }}{{ include "app-chart.fullname" . }}-config{{ end }}
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.customSecret }}{{ .Values.customSecret }}{{ else }}{{ include "app-chart.fullname" . }}-secret{{ end }}
+                  key: API_KEY
+          ports:
+            - name: http
+              containerPort: {{ .Values.env.PORT | int }}
+              protocol: TCP
+          volumeMounts:
+            {{- if .Values.persistence.enabled }}
+            - name: sqlite-storage
+              mountPath: {{ .Values.env.DB_DIR }}
+            {{- end }}
+            - name: config
+              mountPath: /app/.env
+              subPath: .env
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.env.PORT | int }}
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+      volumes:
+        {{- if .Values.persistence.enabled }}
+        - name: sqlite-storage
+          persistentVolumeClaim:
+            claimName: {{ include "app-chart.fullname" . }}-pvc
+        {{- end }}
+        - name: config
+          configMap:
+            name: {{ if .Values.customConfigMap }}{{ .Values.customConfigMap }}{{ else }}{{ include "app-chart.fullname" . }}-config{{ end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+      {{- end }}
+

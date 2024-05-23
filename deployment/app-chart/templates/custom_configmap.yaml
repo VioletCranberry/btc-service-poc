@@ -1,0 +1,7 @@
+{{- if .Values.customConfigMap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.customConfigMap }}
+  namespace: {{ .Values.namespace }}
+{{- end }}

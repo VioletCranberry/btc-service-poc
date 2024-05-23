@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "app-chart.fullname" . }}-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "app-chart.labels" . | nindent 4 }}
+data:
+  .env: |
+    DB_DIR={{ .Values.env.DB_DIR }}
+    DB_NAME={{ .Values.env.DB_NAME }}
+    RETENTION_DAYS={{ .Values.env.RETENTION_DAYS | int }}
+    TICKER={{ .Values.env.TICKER }}
+    CURRENCIES={{ .Values.env.CURRENCIES }}
+    CLEAN_UP_INTERVAL_MINS={{ .Values.env.CLEAN_UP_INTERVAL_MINS | int }}
+    FETCH_INTERVAL_MINS={{ .Values.env.FETCH_INTERVAL_MINS | int }}
+    DEBUG={{ .Values.env.DEBUG }}
+    HOST={{ .Values.env.HOST }}
+    PORT={{ .Values.env.PORT }}
+
